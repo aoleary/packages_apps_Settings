@@ -50,7 +50,6 @@ import com.android.settingslib.bluetooth.BluetoothUtils;
 import com.android.settingslib.bluetooth.LocalBluetoothManager;
 import com.android.settingslib.bluetooth.LocalBluetoothProfileManager;
 import com.android.settingslib.media.MediaOutputConstants;
-import com.android.settings.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
