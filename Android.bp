@@ -99,6 +99,7 @@ android_library {
         "Settings-change-ids",
         "glide",
         "VendorSupport-preference",
+        "faceunlock_framework",
     ],
 
     libs: [
