@@ -31,6 +31,7 @@ import android.view.accessibility.AccessibilityManager;
 
 import androidx.annotation.Nullable;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.android.settings.R;
 import com.android.settings.Utils;
 import com.android.settings.biometrics.BiometricEnrollBase;
@@ -39,7 +40,6 @@ import com.android.settings.biometrics.BiometricUtils;
 import com.android.settings.password.ChooseLockSettingsHelper;
 import com.android.settingslib.widget.LottieColorUtils;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.setupcompat.template.FooterBarMixin;
 import com.google.android.setupcompat.template.FooterButton;
 
@@ -65,9 +65,6 @@ public class FingerprintEnrollFindSensor extends BiometricEnrollBase implements
     private boolean mCanAssumeUdfps;
     private boolean mCanAssumeSfps;
 
-    private OrientationEventListener mOrientationEventListener;
-    private int mPreviousRotation = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,8 +85,6 @@ public class FingerprintEnrollFindSensor extends BiometricEnrollBase implements
                         .build()
         );
 
-        listenOrientationEvent();
-
         if (mCanAssumeUdfps) {
             setHeaderText(R.string.security_settings_udfps_enroll_find_sensor_title);
             setDescriptionText(R.string.security_settings_udfps_enroll_find_sensor_message);
@@ -107,13 +102,10 @@ public class FingerprintEnrollFindSensor extends BiometricEnrollBase implements
             if (am.isEnabled()) {
                 mIllustrationLottie.setAnimation(R.raw.udfps_edu_a11y_lottie);
             }
-        } else if (mCanAssumeSfps) {
-            setHeaderText(R.string.security_settings_sfps_enroll_find_sensor_title);
-            setDescriptionText(R.string.security_settings_sfps_enroll_find_sensor_message);
         } else {
             final boolean isFrontFacingFps = getResources().getBoolean(
                     R.bool.config_is_front_facing_fps);
-            final String fpsLocation = getString(mCanAssumeSidefps
+            final String fpsLocation = getString(mCanAssumeSfps
                     ? R.string.fingerprint_enroll_find_sensor_message_side : isFrontFacingFps
                             ? R.string.fingerprint_enroll_find_sensor_message_front
                             : R.string.fingerprint_enroll_find_sensor_message_rear);
@@ -233,8 +225,6 @@ public class FingerprintEnrollFindSensor extends BiometricEnrollBase implements
     protected int getContentView() {
         if (mCanAssumeUdfps) {
             return R.layout.udfps_enroll_find_sensor_layout;
-        } else if (mCanAssumeSfps) {
-            return R.layout.sfps_enroll_find_sensor_layout;
         }
         return R.layout.fingerprint_enroll_find_sensor;
     }
@@ -309,7 +299,6 @@ public class FingerprintEnrollFindSensor extends BiometricEnrollBase implements
 
     @Override
     protected void onDestroy() {
-        stopListenOrientationEvent();
         super.onDestroy();
         if (mAnimation != null) {
             mAnimation.stopAnimation();
@@ -403,35 +392,5 @@ public class FingerprintEnrollFindSensor extends BiometricEnrollBase implements
     @Override
     public int getMetricsCategory() {
         return SettingsEnums.FINGERPRINT_FIND_SENSOR;
-    }
-
-    private void listenOrientationEvent() {
-        if (!mCanAssumeSfps) {
-            // Do nothing if the device doesn't support SideFPS.
-            return;
-        }
-        mOrientationEventListener = new OrientationEventListener(this) {
-            @Override
-            public void onOrientationChanged(int orientation) {
-                final int currentRotation = getDisplay().getRotation();
-                if ((currentRotation + 2) % 4 == mPreviousRotation) {
-                    mPreviousRotation = currentRotation;
-                    recreate();
-                }
-            }
-        };
-        mOrientationEventListener.enable();
-        mPreviousRotation = getDisplay().getRotation();
-    }
-
-    private void stopListenOrientationEvent() {
-        if (!mCanAssumeSfps) {
-            // Do nothing if the device doesn't support SideFPS.
-            return;
-        }
-        if (mOrientationEventListener != null) {
-            mOrientationEventListener.disable();
-        }
-        mOrientationEventListener = null;
     }
 }
