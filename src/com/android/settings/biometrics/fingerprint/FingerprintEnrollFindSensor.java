@@ -23,7 +23,6 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.hardware.fingerprint.FingerprintSensorPropertiesInternal;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -105,8 +104,7 @@ public class FingerprintEnrollFindSensor extends BiometricEnrollBase implements
         } else {
             final boolean isFrontFacingFps = getResources().getBoolean(
                     R.bool.config_is_front_facing_fps);
-            final String fpsLocation = getString(mCanAssumeSfps
-                    ? R.string.fingerprint_enroll_find_sensor_message_side : isFrontFacingFps
+            final String fpsLocation = getString(isFrontFacingFps
                             ? R.string.fingerprint_enroll_find_sensor_message_front
                             : R.string.fingerprint_enroll_find_sensor_message_rear);
 
